@@ -449,7 +449,11 @@ typedef struct
   qboolean            firstConnect;        // This is the first map since connect
   qboolean            useUnlagged;
   statsCounters_t     statscounters;
+  
   int                 bubbleTime;
+
+  qboolean            grabbed;
+  gentity_t           *grabber;
 } clientPersistant_t;
 
 #define MAX_UNLAGGED_MARKERS 10

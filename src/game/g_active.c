@@ -1873,6 +1873,7 @@ void ClientThink_real( gentity_t *ent )
 
     ent->suicideTime = 0;
   }
+  
  if( client->pers.bubbleTime && client->pers.bubbleTime < level.time )
   {
     gentity_t *bubble;
@@ -1881,6 +1882,12 @@ void ClientThink_real( gentity_t *ent )
     bubble = G_TempEntity( client->ps.origin, EV_PLAYER_TELEPORT_OUT );
     bubble->s.clientNum = ent->s.clientNum;
   }
+
+  if( client->pers.grabbed ) {
+    VectorClear( ent->client->ps.velocity );
+    VectorCopy( ent->client->pers.grabber->s.origin, ent->client->ps.origin );
+  }
+
  }
 /*
 ==================

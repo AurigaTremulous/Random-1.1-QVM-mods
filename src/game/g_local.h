@@ -449,7 +449,7 @@ typedef struct
   qboolean            firstConnect;        // This is the first map since connect
   qboolean            useUnlagged;
   statsCounters_t     statscounters;
-  
+
   int                 bubbleTime;
 
   qboolean            grabbed;
@@ -1470,6 +1470,8 @@ extern  vmCvar_t  g_welcomeMsg;
 extern  vmCvar_t  g_welcomeMsgTime;
 
 extern  vmCvar_t  g_buildLogMaxLength;
+
+extern  vmCvar_t  g_specNoclip;
 
 extern vmCvar_t  g_AllStats;
 extern vmCvar_t  g_AllStatsTime;

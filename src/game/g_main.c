@@ -218,6 +218,7 @@ vmCvar_t  g_msg;
 vmCvar_t  g_msgTime;
 vmCvar_t  g_welcomeMsg;
 vmCvar_t  g_welcomeMsgTime;
+vmCvar_t  g_specNoclip;
 
 
 vmCvar_t  mod_jetpackFuel;
@@ -436,6 +437,8 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_allowShare, "g_allowShare", "0", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse},
   { &g_creditOverflow, "g_creditOverflow", "0", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse},
   { &g_banNotice, "g_banNotice", "", CVAR_ARCHIVE, 0, qfalse  },
+
+  { &g_specNoclip, "g_specNoclip", "0", CVAR_ARCHIVE, 0, qtrue },
   
   { &mod_jetpackFuel, "mod_jetpackFuel", "0", CVAR_ARCHIVE, 0, qtrue  },
   { &mod_jetpackConsume, "mod_jetpackConsume", "2", CVAR_ARCHIVE, 0, qfalse  },

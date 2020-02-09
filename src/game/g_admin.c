@@ -80,6 +80,12 @@ g_admin_cmd_t g_admin_cmds[ ] =
       "[^3name|slot#|IP^7] (^5time^7) (^5reason^7)"
     },
 
+    {"bubble", G_admin_bubble, "bubble",
+      "continuously spawn bubbles around a player",
+      "[^3name|slot#^7]"
+    },
+
+
     {"buildlog", G_admin_buildlog, "buildlog",
       "display a list of recent builds and deconstructs, optionally specifying"
       " a team",
@@ -95,11 +101,6 @@ g_admin_cmd_t g_admin_cmds[ ] =
     {"cp", G_admin_cp, "cp",
       "display a CP message to users, optionally specifying team(s) to send to",
       "(-AHS) [^3message^7]"
-    },
-
-    {"decon", G_admin_decon, "v", qtrue,
-      "Reverts a decon previously made and ban the user for the time specified in g_deconBanTime",
-      "[^3name|slot#^7]"
     },
 
     {"demo", G_admin_demo, "demo",
@@ -7259,161 +7260,56 @@ qboolean G_admin_invisible( gentity_t *ent, int skiparg )
   return qtrue;
 }
 
-qboolean G_admin_decon( gentity_t *ent, int skiparg )
-{
-  int i = 0, j = 0, repeat = 24, pids[ MAX_CLIENTS ], len, matchlen=0;
-  pTeam_t team = PTE_NONE;
-  qboolean force = qfalse, reached = qfalse;
-  gentity_t *builder = NULL, *targ;
-  buildHistory_t *ptr, *tmp, *mark, *prev;
-  vec3_t dist;
-  char arg[ 64 ], err[ MAX_STRING_CHARS ], *name, *bname, *action, *article, *reason;
-  len = G_CountBuildLog( );
 
-  if( !len ) //1
+qboolean G_admin_bubble( gentity_t *ent, int skiparg )
+{
+  int pids[ MAX_CLIENTS ];
+  char name[ MAX_NAME_LENGTH ], err[ MAX_STRING_CHARS ];
+  gentity_t *vic;
+
+  if(g_Bubbles.integer)
   {
-    ADMP( "^3!decon: ^7no build log found, aborting...\n" );
-    return qfalse;
-  }
-  if( G_SayArgc( ) < 2 + skiparg )
-  {
-    ADMP( "^3!decon: ^7usage: !decon (^5name|num^7)\n" );
-    return qfalse;
-  }
-  G_SayArgv( 1 + skiparg, arg, sizeof( arg ) );
-  if( G_ClientNumbersFromString( arg, pids ) != 1 )
-  {
-    G_MatchOnePlayer( pids, err, sizeof( err ) );
-    ADMP( va( "^3!decon: ^7%s\n", err ) );
-    return qfalse;
-  }
-  builder = g_entities + *pids;
-  if(builder->client->sess.invisible == qtrue)
-  {
-    ADMP( va( "^3!decon: ^7no connected player by that name or slot #\n" ) );
-    return qfalse;
-  }
-  if( !admin_higher( ent, builder ) )
-  {
-    ADMP( "^3!decon: ^7sorry, but your intended victim has a higher admin"
-        " level than you\n" );
-    return qfalse;
-  }
-  if( ( builder->r.svFlags & SVF_BOT ) )
-  { 
-    ADMP( "^3!decon: ^7sorry, but usually bots don't decon and you cant kick bots...\n" );
-    return qfalse;
-  }
-  for( i = 0, ptr = prev = level.buildHistory; repeat > 0; repeat--, j = 0 )
-  {
-    if( !ptr ) 
-      break; // run out of bhist
-    if( builder && builder != ptr->ent )
-    {
-      // team doesn't match, so skip this ptr and reset prev
-      prev = ptr;
-      ptr = ptr->next;
-      // we don't want to count this one so counteract the decrement by the for
-      repeat++;
-      continue;
-    }
-    // get the ent's current or last recorded name
-    if( ptr->ent )
-    {
-      if( ptr->ent->client )
-        name = ptr->ent->client->pers.netname;
-      else
-        name = "<world>"; // non-client actions
-    }
-    else
-      name = ptr->name;
-    bname = BG_FindHumanNameForBuildable( ptr->buildable ); 
-    action = "";
-    switch( ptr->fate )
-    {
-      case BF_BUILT:
-        prev = ptr;
-        ptr = ptr->next;
-        repeat++;
-        continue;
-      case BF_DESTROYED:
-        prev = ptr;
-        ptr = ptr->next;
-        repeat++;
-      case BF_DECONNED:
-        if( !action[ 0 ] ) action = "^3deconstruction^7";
-      case BF_TEAMKILLED:
-        if( !action[ 0 ] ) action ="^1TEAMKILL^7";
-        // if we're not overriding and the replacement can't fit, as before
-        if( !G_RevertCanFit( ptr ) )
-        {
-          prev = ptr;
-          ptr = ptr->next;
-          repeat++;
-          continue;
-        }
-        // else replace it but don't mark it ( it might have been marked before
-        // but it isn't that important )
-        G_SpawnRevertedBuildable( ptr, qfalse );
-        break;
-      default:
-        // if this happens something has gone wrong
-        ADMP( "^3!decon: ^7incomplete or corrupted build log entry\n" );
-        /* quarantine and dispose of the log, it's dangerous
-        trap_Cvar_Set( "g_buildLogMaxLength", "0" );
-        G_CountBuildLog( );
-        */
-        return qfalse;
-      }
-      // this is similar to the buildlog stuff
-      if( BG_FindUniqueTestForBuildable( ptr->buildable ) )
-        article = "the";
-      else if( strchr( "aeiouAEIOU", *bname ) )
-        article = "an";
-      else
-        article = "a";
-      AP( va( "print \"%s^7 reverted %s^7'%s %s of %s %s\n\"", 
-          ( ent ) ? G_admin_adminPrintName( ent ) : "console",
-          name, strchr( "Ss", name[ strlen( name ) - 1 ] ) ? "" : "s",
-          action, article, bname ) ); 
-      matchlen++;
-      // remove the reverted entry
-      // ptr moves on, prev just readjusts ->next unless it is about to be 
-      // freed, in which case it is forced to move on too
-      tmp = ptr;
-      if( ptr == level.buildHistory )
-        prev = level.buildHistory = ptr = ptr->next;
-      else
-        prev->next = ptr = ptr->next;
-      G_Free( tmp );
-  }
-  if( !matchlen )
-  {
-     ADMP( "^3!decon: ^7This user doesn't seems to have deconned anything...\n" );
+   if( G_SayArgc() < 2 + skiparg )
+   {
+     ADMP( "^3!bubble: ^7usage: !bubble [name|slot#]\n" );
      return qfalse;
+   }
+   G_SayArgv( 1 + skiparg, name, sizeof( name ) );
+   if( G_ClientNumbersFromString( name, pids ) != 1 )
+   {
+     G_MatchOnePlayer( pids, err, sizeof( err ) );
+     ADMP( va( "^3!bubble: ^7%s\n", err ) );
+     return qfalse;
+   }
+  vic = &g_entities[ pids[ 0 ] ];
+  if(vic->client->sess.invisible == qtrue)
+ {
+    ADMP( va( "^3!bubble: ^7no connected player by that name or slot #\n" ) );
+    return qfalse;
+ }
+   if( !admin_higher( ent, &g_entities[ pids[ 0 ] ] ) )
+   {
+     ADMP( "^3!bubble: ^7sorry, but your intended victim has a higher admin"
+         " level than you\n" );
+     return qfalse;
+  }
+
+
+  if( vic->client->pers.bubbleTime )
+    vic->client->pers.bubbleTime = 0;
+  else
+    vic->client->pers.bubbleTime = level.time + 500;
+
+  AP( va( "print \"^3!bubble: ^7bubbles %s for %s^7 by %s\n\"",
+    ( vic->client->pers.bubbleTime ) ? "enabled" : "disabled",
+    vic->client->pers.netname,
+    ( ent ) ? G_admin_adminPrintName( ent ) : "console" ) );
   }
   else
   {
-    ADMP( va( "^3!decon: ^7reverted %d buildlog events\n", matchlen ) );  
-
-  admin_create_ban( ent,
-    builder->client->pers.netname,
-    builder->client->pers.guid,
-    builder->client->pers.ip, G_admin_parse_time( g_deconBanTime.string ),
-    ( *reason ) ? reason : "^1Decon" );
-  if( g_admin.string[ 0 ] )
-    admin_writeconfig();
-
- trap_SendServerCommand( pids[ 0 ],
-  va( "disconnect \"You have been kicked.\n%s^7\nreason:\n%s\n%s\"",
-    ( ent ) ? va( "admin:\n%s", G_admin_adminPrintName( ent ) ) : "admin\nconsole",
-    ( *reason ) ? reason : "^1Decon" ) );
-  
-  trap_DropClient( pids[ 0 ], va( "kicked%s^7, reason: %s",
-    ( ent ) ? va( " by %s", G_admin_adminPrintName( ent ) ) : " by console",
-    ( *reason ) ? reason : "^1Decon" ) );
+     ADMP( "^3!bubble: ^7sorry, but bubbles have been disabled on this server.\n" );
+     return qfalse;
   }
-
-  
   return qtrue;
+
 }

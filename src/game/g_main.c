@@ -218,7 +218,6 @@ vmCvar_t  g_msg;
 vmCvar_t  g_msgTime;
 vmCvar_t  g_welcomeMsg;
 vmCvar_t  g_welcomeMsgTime;
-vmCvar_t  g_deconBanTime;
 
 
 vmCvar_t  mod_jetpackFuel;
@@ -234,6 +233,8 @@ vmCvar_t  g_teamKillThreshold;
 vmCvar_t  g_aimbotAdvertBan;
 vmCvar_t  g_aimbotAdvertBanTime;
 vmCvar_t  g_aimbotAdvertBanReason;
+
+vmCvar_t  g_Bubbles;
 
 static cvarTable_t   gameCvarTable[ ] =
 {
@@ -430,7 +431,6 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_msgTime, "g_msgTime", "0", CVAR_ARCHIVE, 0, qfalse  },
   { &g_welcomeMsg, "g_welcomeMsg", "", CVAR_ARCHIVE, 0, qfalse  },
   { &g_welcomeMsgTime, "g_welcomeMsgTime", "0", CVAR_ARCHIVE, 0, qfalse  },
-  { &g_deconBanTime, "g_deconBanTime", "1w", CVAR_ARCHIVE, 0, qfalse  },
   
   { &g_rankings, "g_rankings", "0", 0, 0, qfalse },
   { &g_allowShare, "g_allowShare", "0", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse},
@@ -445,7 +445,9 @@ static cvarTable_t   gameCvarTable[ ] =
 
   { &g_aimbotAdvertBan, "g_aimbotAdvertBan", "0", CVAR_ARCHIVE, 0, qfalse  },
   { &g_aimbotAdvertBanTime, "g_aimbotAdvertBanTime", "0", CVAR_ARCHIVE, 0, qfalse  },
-  { &g_aimbotAdvertBanReason, "g_aimbotAdvertBanReason", "AUTOBAN: AIMBOT", CVAR_ARCHIVE, 0, qfalse  }
+  { &g_aimbotAdvertBanReason, "g_aimbotAdvertBanReason", "AUTOBAN: AIMBOT", CVAR_ARCHIVE, 0, qfalse  },
+
+  { &g_Bubbles, "g_Bubbles", "1", CVAR_ARCHIVE, 0, qfalse  }
 };
 
 static int gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[ 0 ] );

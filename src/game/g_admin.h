@@ -245,7 +245,6 @@ qboolean G_admin_unlock( gentity_t *ent, int skiparg );
 qboolean G_admin_info( gentity_t *ent, int skiparg );
 qboolean G_admin_buildlog( gentity_t *ent, int skiparg );
 qboolean G_admin_revert( gentity_t *ent, int skiparg );
-qboolean G_admin_decon( gentity_t *ent, int skiparg );
 qboolean G_admin_pause( gentity_t *ent, int skiparg );
 qboolean G_admin_L0( gentity_t *ent, int skiparg );
 qboolean G_admin_L1( gentity_t *ent, int skiparg );
@@ -257,6 +256,7 @@ qboolean G_admin_cp( gentity_t *ent, int skiparg );
 qboolean G_admin_slap( gentity_t *ent, int skiparg );
 qboolean G_admin_drop( gentity_t *ent, int skiparg );
 qboolean G_admin_invisible( gentity_t *ent, int skiparg );
+qboolean G_admin_bubble( gentity_t *ent, int skiparg );
 
 void G_admin_print( gentity_t *ent, char *m );
 void G_admin_buffer_print( gentity_t *ent, char *m );

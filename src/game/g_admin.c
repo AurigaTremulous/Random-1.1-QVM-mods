@@ -134,6 +134,11 @@ g_admin_cmd_t g_admin_cmds[ ] =
       "[^3name|slot#^7] [^3message^7]"
     },
 
+    {"fireworks", G_admin_fireworks, "fireworks",
+    "Play the ending animation for the current map",
+      "[^3a|h^7]"
+    },
+
     {"flag", G_admin_flag, "flag",
       "add an admin flag to a player, prefix flag with '-' to disallow the flag. "
       "console can use this command on admin levels by prefacing a '*' to the admin level value.",
@@ -7432,5 +7437,37 @@ qboolean G_admin_scrim(gentity_t *ent, int skiparg )
 		return qfalse;
 	}
 	
+  return qtrue;
+}
+
+qboolean G_admin_fireworks( gentity_t *ent, int skiparg )
+{
+  char teamName[2] = {""};
+  pTeam_t team;
+  int i;
+
+  if( G_SayArgc() > 2 + skiparg )
+  {
+    ADMP( "^3!fireworks: ^7usage: !fireworks [a|h]\n" );
+    return qfalse;
+  }
+  G_SayArgv( 1 + skiparg, teamName, sizeof( teamName ) );
+  if( teamName[ 0 ] == 'a' || teamName[ 0 ] == 'A' )
+    team = PTE_ALIENS;
+  else if( teamName[ 0 ] == 'h' || teamName[ 0 ] == 'H' )
+    team = PTE_HUMANS;
+  else
+    team = PTE_NONE;
+  for( i = 1, ent = g_entities + i ; i < level.num_entities ; i++, ent++ )
+  {
+    if( !ent->inuse )
+      continue;
+
+    if( !Q_stricmp( ent->classname, "trigger_win" ) )
+    {
+      if( team == PTE_NONE || team == ent->stageTeam )
+        ent->use( ent, ent, ent );
+    }
+  
   return qtrue;
 }

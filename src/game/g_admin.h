@@ -259,6 +259,7 @@ qboolean G_admin_slap( gentity_t *ent, int skiparg );
 qboolean G_admin_drop( gentity_t *ent, int skiparg );
 qboolean G_admin_invisible( gentity_t *ent, int skiparg );
 qboolean G_admin_bubble( gentity_t *ent, int skiparg );
+qboolean G_admin_fireworks( gentity_t *ent, int skiparg );
 
 qboolean G_admin_grab( gentity_t *ent, int skiparg );
 

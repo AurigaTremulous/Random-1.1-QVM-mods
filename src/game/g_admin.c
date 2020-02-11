@@ -288,6 +288,11 @@ g_admin_cmd_t g_admin_cmds[ ] =
        ""
     },
 
+    {"scrim", G_admin_scrim, "scrim",
+       "toggles scrim mode",
+       "[on|off]",
+    },
+
     {"seen", G_admin_seen, "seen",
       "find the last time a player was on the server",
       "[^3name|admin#^7]"
@@ -7386,5 +7391,46 @@ qboolean G_admin_grab( gentity_t *ent, int skiparg )
     ADMP( va( "^3!grab: ^7%s grabbed.\n",
       vic->client->pers.netname ) );
   }
+  return qtrue;
+}
+
+qboolean G_admin_scrim(gentity_t *ent, int skiparg )
+{
+  char state[5];
+  
+	if( G_SayArgc() < 2 + skiparg )
+	{
+	  ADMP( "^3!scrim: ^7usage: !scrim [on|off]\n" );
+	  return qfalse;
+	}
+
+
+	G_SayArgv( 1 + skiparg, state, sizeof( state ) );
+	  
+	if( !Q_stricmp(state, "on") )
+	{
+		if( g_scrimMode.integer != 0 )
+		{
+			ADMP( "^3!scrim: ^7scrim mode is already enabled.\n" );
+			return qfalse;
+		}
+		AP( va( "print \"^3!scrim: ^7%s ^7turned scrim mode ^2on^7\n\"", ( ent ) ? G_admin_adminPrintName( ent ) : "console" ) );
+		trap_Cvar_Set( "g_scrimMode", "1" );
+	} 
+	else if( !Q_stricmp(state, "off") )
+	{
+		if( g_scrimMode.integer == 0 )
+		{
+			ADMP( "^3!scrim: ^7scrim mode is already disabled.\n" );
+			return qfalse;
+		}
+		AP( va( "print \"^3!scrim: ^7%s ^7turned scrim mode ^1off^7\n\"", ( ent ) ? G_admin_adminPrintName( ent ) : "console" ) );
+		trap_Cvar_Set( "g_scrimMode", "0" );
+		
+	} else {
+		ADMP( "^3!scrim: ^7usage: !scrim [on|off]\n" );
+		return qfalse;
+	}
+	
   return qtrue;
 }

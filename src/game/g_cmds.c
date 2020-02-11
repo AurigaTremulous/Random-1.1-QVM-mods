@@ -768,6 +768,13 @@ void Cmd_Team_f( gentity_t *ent )
     return;
   }
   
+  if( g_scrimMode.integer != 0 && !G_admin_permission( ent, ADMF_NOSCRIMRESTRICTION ) )
+  {
+    trap_SendServerCommand( ent-g_entities,
+                            va( "print \"You can't join a team when scrim mode is enabled\n\"" ) );
+    return;
+  }
+
   if( oldteam == PTE_ALIENS )
     aliens--;
   else if( oldteam == PTE_HUMANS )
@@ -991,8 +998,8 @@ static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, cons
   }
   
   if( mode == SAY_ADMINS &&
-     (!G_admin_permission( other, ADMF_ADMINCHAT ) || other->client->pers.ignoreAdminWarnings ) )
-     return;
+     (!G_admin_permission( other, ADMF_ADMINCHAT ) || other->client->pers.ignoreAdminWarnings ||
+      ( g_scrimMode.integer != 0 && !G_admin_permission( ent, ADMF_NOSCRIMRESTRICTION ) ) ) )
 
   if( BG_ClientListTest( &other->client->sess.ignoreList, ent-g_entities ) )
     ignore = qtrue;
@@ -1030,6 +1037,11 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText )
     if( !G_admin_cmd_check( ent, qtrue ) )
       trap_SendServerCommand( ent-g_entities, "print \"You cannot chat while invisible\n\"" );
     return;
+  }
+  if( ent && ent->client->pers.teamSelection == PTE_NONE && g_scrimMode.integer != 0 && !G_admin_permission( ent, ADMF_NOSCRIMRESTRICTION ) && mode != SAY_TEAM )
+  {
+      trap_SendServerCommand( ent-g_entities, "print \"You can't chat when scrim mode is enabled.\n\"" );
+      return;
   }
 
   // Spam limit: If they said this message recently, ignore it.
@@ -1531,6 +1543,14 @@ void Cmd_CallVote_f( gentity_t *ent )
     trap_SendServerCommand( ent - g_entities,
       "print \"You are muted and cannot call votes\n\"" );
     return;
+  }
+  
+  if( !G_admin_permission( ent, ADMF_NOSCRIMRESTRICTION ) && g_scrimMode.integer != 0 &&
+      ent->client->pers.teamSelection == PTE_NONE )
+  {
+    trap_SendServerCommand( ent - g_entities,
+      "print \"You can't call votes when scrim mode is enabled\n\"" );
+	return;
   }
 
   // make sure it is a valid command to vote on

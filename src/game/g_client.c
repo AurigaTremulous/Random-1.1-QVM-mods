@@ -1274,6 +1274,11 @@ void ClientUserinfoChanged( int clientNum, qboolean forceName )
       G_admin_namelog_update( client, qfalse );
     }
   }
+     if( g_scrimMode.integer == 1 )
+    {
+    ADMP( "^5Scrim mode is enabled. Teams are locked and you can only use spectator chat.\n" );  
+    }
+
 
   // set max health
   health = atoi( Info_ValueForKey( userinfo, "handicap" ) );

@@ -95,6 +95,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define ADMF_SPECIAL             "SPECIAL"
 #define ADMF_SPECIALNAME         "SPECIALNAME"
 
+#define ADMF_NOSCRIMRESTRICTION  "NOSCRIMRESTRICTION"
+
 #define ADMF_NO_CHAT             ".NOCHAT"
 #define ADMF_NO_VOTE             ".NOVOTE"
 
@@ -252,11 +254,12 @@ qboolean G_admin_putmespec( gentity_t *ent, int skiparg );
 qboolean G_admin_warn( gentity_t *ent, int skiparg );
 qboolean G_admin_designate( gentity_t *ent, int skiparg );
 qboolean G_admin_cp( gentity_t *ent, int skiparg );
-
+qboolean G_admin_scrim( gentity_t *ent, int skiparg );
 qboolean G_admin_slap( gentity_t *ent, int skiparg );
 qboolean G_admin_drop( gentity_t *ent, int skiparg );
 qboolean G_admin_invisible( gentity_t *ent, int skiparg );
 qboolean G_admin_bubble( gentity_t *ent, int skiparg );
+
 qboolean G_admin_grab( gentity_t *ent, int skiparg );
 
 void G_admin_print( gentity_t *ent, char *m );

@@ -237,6 +237,7 @@ vmCvar_t  g_aimbotAdvertBanReason;
 
 vmCvar_t  g_Bubbles;
 vmCvar_t  g_scrimMode;
+vmCvar_t  g_noAbusableCMDs;
 
 static cvarTable_t   gameCvarTable[ ] =
 {
@@ -452,7 +453,8 @@ static cvarTable_t   gameCvarTable[ ] =
   { &g_aimbotAdvertBanReason, "g_aimbotAdvertBanReason", "AUTOBAN: AIMBOT", CVAR_ARCHIVE, 0, qfalse  },
 
   { &g_Bubbles, "g_Bubbles", "1", CVAR_ARCHIVE, 0, qfalse  },
-  { &g_scrimMode, "g_scrimMode", "0", CVAR_ARCHIVE, 0, qfalse }
+  { &g_scrimMode, "g_scrimMode", "0", CVAR_ARCHIVE, 0, qfalse },
+  { &g_noAbusableCMDs, "g_noAbusableCMDs", "1", CVAR_ARCHIVE, 0, qfalse  }
 };
 
 static int gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[ 0 ] );

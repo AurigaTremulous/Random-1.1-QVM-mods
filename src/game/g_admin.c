@@ -7471,3 +7471,4 @@ qboolean G_admin_fireworks( gentity_t *ent, int skiparg )
   
   return qtrue;
 }
+}
